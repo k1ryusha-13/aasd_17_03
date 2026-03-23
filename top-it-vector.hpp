@@ -14,11 +14,11 @@ namespace topit
     Vector& operator=(Vector&&);
 
     bool isEmpty() const noexcept;
-    size_t getSize() const noexcept;//что нибудь из этого или все + протестировать
+    size_t getSize() const noexcept;
     size_t getCapacity() const noexcept;
 
-    void pushBack(const T& v);//domashka
-    void popBack();//и этого к след аисду
+    void pushBack(const T& v);
+    void popBack();
     void insert(size_t i, const T& v);
     void erase(size_t i);
 
@@ -27,9 +27,70 @@ namespace topit
       size_t size_, capacity_;
   };
 }
+
+template< class T >
+size_t topit::Vector< T >::getSize() const noexcept
+{
+  return size_;
+}
+
+template< class T >
+size_t topit::Vector< T >::getCapacity() const noexcept
+{
+  return cap_;
+}
+
 template< class T >
 void topit::Vector< T >::pushBack(const T& v)
-{}
+{
+  T* newData = nullptr;
+  try
+  {
+    newData = new T[cap_ + 1];
+    for (size_t i = 0; i < size_; ++i)
+    {
+      newData[i] = data_[i];
+    }
+    newData[size_] = v;
+    delete[] data_;
+    data_ = newData;
+    ++cap_;
+    ++size_;
+  }
+  catch(...)
+  {
+    delete[] newData;
+    throw;
+  }
+}
+
+template< class T >
+void topit::Vector< T >::popBack()
+{
+    if (!size_)
+  {
+    return;
+  }
+
+  T* newData = nullptr;
+  try
+  {
+    newData = new T[cap_ - 1];
+    for (size_t i = 0; i < size_ - 1; ++i)
+    {
+      newData[i] = data_[i];
+    }
+    delete[] data_;
+    data_ = newData;
+    --cap_;
+    --size_;
+  }
+  catch(...)
+  {
+    delete[] newData;
+    throw;
+  }
+}
 
 template< class T >
 bool topit::Vector< T >::isEmpty() const noexcept
@@ -47,4 +108,5 @@ topit::Vector< T >::Vector():
   size_(0),
   capacity_(0)
 {}
+
 #endif
