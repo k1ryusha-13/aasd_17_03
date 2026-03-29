@@ -120,10 +120,18 @@ bool testElementOutOfBoundConstAccess()
   }
 }
 
-bool testCopyConstructor()
+bool testCopyConstructorForEmpty()
 {
   topit::Vector< int > v;
-  topit::Vector< int > yav = v;
+  topit::Vector< int > yav(v);
+  return v == yav;
+}
+
+bool testCopyConstructorforNonEmpty()
+{
+  topit::Vector< int > v;
+  v.pushBack(1);
+  topit::Vector< int > yav(v);
   return v == yav;
 }
 
@@ -132,15 +140,15 @@ int main()
   using test_t = std::pair< const char*, bool(*)() >;
   test_t tests[] = {
     { "Empty vector", testEmptyVector },
-    {"Size of vector", testSizeOfVector},
-    {"Capacity of vector", testCapacityOfVector},
-    {"Push and Pop value", testPushAndPopValue},
-    {"Push and Pop value", testPushAndPopValue},
-    {"Inbound access", testElementInboundAccess},
-    {"Out of bound access", testElementOutOfBoundAccess},
-    {"Inbound const access", testElementInboundConstAccess},
-    {"Out of bound const access", testElementOutOfBoundConstAccess},
-    {"Copy constructor", testCopyConstructor},
+    { "Size of vector", testSizeOfVector },
+    { "Capacity of vector", testCapacityOfVector },
+    { "Push and Pop value", testPushAndPopValue },
+    { "Inbound access", testElementInboundAccess },
+    { "Out of bound access", testElementOutOfBoundAccess },
+    { "Inbound const access", testElementInboundConstAccess },
+    { "Out of bound const access", testElementOutOfBoundConstAccess },
+    { "Copy empty constructor", testCopyConstructorForEmpty },
+    { "Copy for non empty constructor", testCopyConstructorforNonEmpty },
   };
   const size_t count = sizeof(tests) / sizeof(test_t);
   std::cout << std::boolalpha;
