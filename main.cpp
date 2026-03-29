@@ -70,7 +70,7 @@ bool testElementInboundAccess()
   }
 }
 
-bool testElementOutOfBound()
+bool testElementOutOfBoundAccess()
 {
   topit::Vector< int > v;
   try
@@ -85,7 +85,39 @@ bool testElementOutOfBound()
   {
     return false;
   }
-  
+}
+
+  bool testElementInboundConstAccess()
+{
+  topit::Vector< int > v;
+  v.pushBack(1);
+  const topit::Vector< int >& rv = v;
+  try
+  {
+    const int& val = rv.at(0);
+    return val == 1;
+  }
+  catch(...)
+  {
+    return false;
+  }
+}
+
+bool testElementOutOfBoundConstAccess()
+{
+  const topit::Vector< int > v;
+  try
+  {
+    v.at(0);
+    return false;
+  }
+  catch(const std::out_of_range&)
+  {
+    return true;
+  } catch(...)
+  {
+    return false;
+  }
 }
 
 int main()
@@ -98,7 +130,9 @@ int main()
     {"Push and Pop value", testPushAndPopValue},
     {"Push and Pop value", testPushAndPopValue},
     {"Inbound access", testElementInboundAccess},
-    {"Out of bound access", testElementOutOfBound}
+    {"Out of bound access", testElementOutOfBoundAccess},
+    {"Inbound const access", testElementInboundConstAccess},
+    {"Out of bound const access", testElementOutOfBoundConstAccess},
   };
   const size_t count = sizeof(tests) / sizeof(test_t);
   std::cout << std::boolalpha;

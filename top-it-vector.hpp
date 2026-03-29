@@ -7,7 +7,7 @@ namespace topit
 {
   template< class T >
   struct Vector {
-    publick:
+    public:
       Vector();
       ~Vector();
       Vector(const Vector&);
@@ -73,13 +73,23 @@ void topit::Vector< T >::extend(T** oldData, size_t& k, const T& newT)
 }
 
 template< class T >
+T& topit::Vector< T >::operator[](size_t id) noexcept
+{
+  return data_[id];
+}
+
+
+template< class T >
+const T& topit::Vector< T >::operator[](size_t id) const noexcept
+{
+  return data_[id];
+}
+
+template< class T >
 T& topit::Vector< T >::at(size_t id)
 {
-  if (id < getSize())
-  {
-    return data_[id];
-  }
-  throw std::out_of_range("bad id");
+  const Vector< T >* cthis = this;
+  return const_cast< T& >(cthis->at(id));
 }
 
 template< class T >
@@ -122,7 +132,7 @@ void topit::Vector< T >::popBack()
   T* newData = nullptr;
   try
   {
-    newData = new T[cap_ - 1];
+    newData = new T[capacity_ - 1];
     for (size_t i = 0; i < size_ - 1; ++i)
     {
       newData[i] = data_[i];
