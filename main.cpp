@@ -1,6 +1,7 @@
+#include "top-it-vector.hpp"
 #include <iostream>
 #include <iomanip>
-#include "top-it-vector.hpp"
+
 
 bool testEmptyVector()
 {
@@ -8,11 +9,96 @@ bool testEmptyVector()
   return v.isEmpty();
 }
 
+bool testSizeOfVector()
+{
+  topit::Vector< int > v;
+  v.pushBack(1);
+  v.pushBack(2);
+  v.pushBack(3);
+  v.pushBack(4);
+  v.pushBack(5);
+  return v.getSize() == 5;
+}
+
+bool testCapacityOfVector()
+{
+  topit::Vector< int > v;
+  bool res = v.getCapacity() == 0;
+  v.pushBack(1);
+  v.pushBack(2);
+  v.pushBack(3);
+  v.pushBack(4);
+  v.pushBack(5);
+  res = res && v.getCapacity() == 8;
+  v.pushBack(1);
+  v.pushBack(2);
+  v.pushBack(3);
+  v.pushBack(4);
+  v.pushBack(5);
+  res = res && v.getCapacity() == 16;
+  return res;
+}
+
+bool testPushAndPopValue()
+{
+  topit::Vector< int > v;
+  v.pushBack(1);
+  v.pushBack(2);
+  v.pushBack(3);
+
+  bool res = v.getSize() == 3;
+
+  v.popBack();
+  v.popBack();
+
+  res = res && v.getSize() == 1;
+  return res;
+}
+
+bool testElementInboundAccess()
+{
+  topit::Vector< int > v;
+  v.pushBack(1);
+  try
+  {
+    int& val = v.at(0);
+    return val == 1;
+  }
+  catch(...)
+  {
+    return false;
+  }
+}
+
+bool testElementOutOfBound()
+{
+  topit::Vector< int > v;
+  try
+  {
+    v.at(0);
+    return false;
+  }
+  catch(const std::out_of_range&)
+  {
+    return true;
+  } catch(...)
+  {
+    return false;
+  }
+  
+}
+
 int main()
 {
   using test_t = std::pair< const char*, bool(*)() >;
   test_t tests[] = {
-    { "Empty vector", testEmptyVector }
+    { "Empty vector", testEmptyVector },
+    {"Size of vector", testSizeOfVector},
+    {"Capacity of vector", testCapacityOfVector},
+    {"Push and Pop value", testPushAndPopValue},
+    {"Push and Pop value", testPushAndPopValue},
+    {"Inbound access", testElementInboundAccess},
+    {"Out of bound access", testElementOutOfBound}
   };
   const size_t count = sizeof(tests) / sizeof(test_t);
   std::cout << std::boolalpha;

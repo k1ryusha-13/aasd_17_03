@@ -1,28 +1,37 @@
 #ifndef TOP_IT_VECTOR_HPP
 #define TOP_IT_VECTOR_HPP
 #include <cstddef>
+#include <iostream>
 
 namespace topit
 {
   template< class T >
   struct Vector {
-    Vector();
-    ~Vector();
-    Vector(const Vector&);
-    Vector(Vector&&);
-    Vector& operator=(const Vector&);
-    Vector& operator=(Vector&&);
+    publick:
+      Vector();
+      ~Vector();
+      Vector(const Vector&);
+      Vector(Vector&&);
+      Vector& operator=(const Vector&);
+      Vector& operator=(Vector&&);
 
-    bool isEmpty() const noexcept;
-    size_t getSize() const noexcept;
-    size_t getCapacity() const noexcept;
+      T& operator[](size_t id) noexcept;
+      const T& operator[](size_t id) const noexcept;
 
-    void pushBack(const T& v);
-    void popBack();
-    void insert(size_t i, const T& v);
-    void erase(size_t i);
+      T& at(size_t it);
+      const T& at(size_t it) const;
+
+      bool isEmpty() const noexcept;
+      size_t getSize() const noexcept;
+      size_t getCapacity() const noexcept;
+
+      void pushBack(const T& v);
+      void popBack();
+      void insert(size_t i, const T& v);
+      void erase(size_t i);
 
     private:
+    void extend(T** oldData, size_t& k, const T& newT);
       T* data_;
       size_t size_, capacity_;
   };
@@ -37,32 +46,70 @@ size_t topit::Vector< T >::getSize() const noexcept
 template< class T >
 size_t topit::Vector< T >::getCapacity() const noexcept
 {
-  return cap_;
+  return capacity_;
 }
 
 template< class T >
-void topit::Vector< T >::pushBack(const T& v)
+void topit::Vector< T >::extend(T** oldData, size_t& k, const T& newT)
 {
   T* newData = nullptr;
   try
   {
-    newData = new T[cap_ + 1];
-    for (size_t i = 0; i < size_; ++i)
+    newData = new T[k * 2];
+    for (size_t i = 0; i < k; ++i)
     {
-      newData[i] = data_[i];
+      newData[i] = (*oldData)[i];
     }
-    newData[size_] = v;
-    delete[] data_;
-    data_ = newData;
-    ++cap_;
-    ++size_;
+    newData[k++] = newT;
   }
   catch(...)
   {
     delete[] newData;
     throw;
   }
+
+  delete[] *oldData;
+  *oldData = newData;
 }
+
+template< class T >
+T& topit::Vector< T >::at(size_t id)
+{
+  if (id < getSize())
+  {
+    return data_[id];
+  }
+  throw std::out_of_range("bad id");
+}
+
+template< class T >
+const T& topit::Vector< T >::at(size_t id) const
+{
+  if (id < getSize())
+  {
+    return data_[id];
+  }
+  throw std::out_of_range("bad id");
+}
+
+template< class T >
+void topit::Vector< T >::pushBack(const T& v)
+{
+  if (capacity_ == 0)
+  {
+    data_ = new T[8];
+    capacity_ = 8;
+  } else if (size_ >= capacity_)
+  {
+    extend(&data_, size_, v);
+    capacity_ *= 2;
+    return;
+  }
+
+  data_[size_] = v;
+  size_++;
+}
+
 
 template< class T >
 void topit::Vector< T >::popBack()
@@ -82,7 +129,7 @@ void topit::Vector< T >::popBack()
     }
     delete[] data_;
     data_ = newData;
-    --cap_;
+    --capacity_;
     --size_;
   }
   catch(...)
