@@ -87,7 +87,7 @@ bool testElementOutOfBoundAccess()
   }
 }
 
-  bool testElementInboundConstAccess()
+bool testElementInboundConstAccess()
 {
   topit::Vector< int > v;
   v.pushBack(1);
@@ -123,7 +123,7 @@ bool testElementOutOfBoundConstAccess()
 bool testCopyConstructorForEmpty()
 {
   topit::Vector< int > v;
-  topit::Vector< int > yav(v);
+  topit::Vector< int > yav = v;
   return v == yav;
 }
 
@@ -131,7 +131,7 @@ bool testCopyConstructorforNonEmpty()
 {
   topit::Vector< int > v;
   v.pushBack(1);
-  topit::Vector< int > yav(v);
+  topit::Vector< int > yav = v;
   return v == yav;
 }
 
