@@ -2,41 +2,53 @@
 #define TOP_IT_VECTOR_HPP
 #include <cstddef>
 #include <iostream>
+#include <memory>
+#include "top-it-iterator.hpp"
+#include "top-it-const-iterator.hpp"
 
 namespace topit
 {
   template< class T >
   struct Vector {
     public:
-      Vector();
       ~Vector();
+
+      Vector();
       Vector(const Vector&);
       Vector(Vector&&) noexcept;
       Vector(size_t size, const T& init);
-      explicit Vector(std::initializer_list< T > il);
+
       Vector< T >& operator=(const Vector&);
       Vector< T >& operator=(Vector&&) noexcept;
+
+      T& operator[](size_t id) noexcept;
+      const T& operator[](size_t id) const noexcept;
+
+      T& at(size_t it);
+      const T& at(size_t it) const;
 
       bool isEmpty() const noexcept;
       size_t getSize() const noexcept;
       size_t getCapacity() const noexcept;
-      void reserve(size_t k);
-      void shrinkToFit();
-      void pushBackCount(sizre_t k, const T& v);
-      template< class T >
-      void pushBackRange(IT b, IT e);
 
-      T& operator[](size_t id) noexcept;
-      const T& operator[](size_t id) const noexcept;
-      T& at(size_t it);
-      const T& at(size_t it) const;
+      VecIter< T > begin() const;
+      VecConstIter< T > cbegin() const;
+      VecIter< T > end() const;
+      VecConstIter< T > cend() const;
 
       void pushBack(const T& v);
       void popBack();
       void insert(size_t pos, const T& v);
+      void insert(VecIter< T > pos, const T& v);
+      void insert(VecIter< T > pos, size_t count, const T& v);
+      void insert(VecIter< T > pos, VecIter< T > start, VecIter< T > end);
+
       void insert(const Vector< T >& another, size_t start, size_t end, size_t pos);
       void erase(size_t pos);
       void erase(size_t start, size_t end);
+      void erase(VecIter< T > pos);
+      void erase(VecIter< T > pos, size_t s);
+      void erase(VecIter< T > start, VecIter< T > end);
       void swap(Vector< T >& rhs) noexcept;
 
     private:
@@ -125,15 +137,6 @@ T& topit::Vector< T >::operator[](size_t id) noexcept
 }
 
 template< class T >
-topit::Vector< T >::Vector(std::initializer_list< T > il)
-{
-  size_t i = 0;
-  for (auto it = il.begin(); it != il.end(); ++it) {
-    data_[i++] = *it;
-  }
-}
-
-template< class T >
 const T& topit::Vector< T >::operator[](size_t id) const noexcept
 {
   return data_[id];
@@ -175,6 +178,33 @@ size_t topit::Vector< T >::getCapacity() const noexcept
 }
 
 template< class T >
+topit::VecIter< T > topit::Vector< T >::begin() const
+{
+  VecIter< T > it = VecIter< T >{data_, size_, 0};
+  return it;
+}
+template< class T >
+topit::VecConstIter< T > topit::Vector< T >::cbegin() const
+{
+  VecConstIter< T > it = VecConstIter< T >{data_, size_, 0};
+  return it;
+}
+
+template< class T >
+topit::VecConstIter< T > topit::Vector< T >::cend() const
+{
+  VecConstIter< T > it = VecConstIter< T >{data_, size_, size_};
+  return it;
+}
+
+template< class T >
+topit::VecIter< T > topit::Vector< T >::end() const
+{
+  VecIter< T > it = VecIter< T >{data_, size_, size_};
+  return it;
+}
+
+template< class T >
 void topit::Vector< T >::pushBack(const T& v)
 {
   insert(size_, v);
@@ -184,6 +214,32 @@ template< class T >
 void topit::Vector< T >::popBack()
 {
     erase(size_);
+}
+
+template< class T >
+void topit::Vector< T >::insert(VecIter< T > pos, const T& v)
+{
+  insert(pos.pos_, v);
+}
+
+template< class T >
+void topit::Vector< T >::insert(VecIter< T > pos, size_t count, const T& v)
+{
+  for (size_t i = 0; i < count; ++i)
+  {
+    insert(pos.pos_, v);
+  }
+}
+
+template< class T >
+void topit::Vector< T >::insert(VecIter< T > pos, VecIter< T > start, VecIter< T > end)
+{
+  size_t index = pos.pos_;
+  for (VecIter<T> s = start; s != end; ++s)
+  {
+    insert(index, *s);
+    ++index;
+  }
 }
 
 template< class T >
@@ -289,6 +345,31 @@ void topit::Vector< T >::erase(size_t start, size_t end)
     delete[] newData;
     throw;
   }
+}
+
+template< class T >
+void topit::Vector< T >::erase(VecIter< T > pos)
+{
+  erase(pos.pos_);
+}
+
+
+template< class T >
+void topit::Vector< T >::erase(VecIter< T > pos, size_t s)
+{
+  for (size_t i = 0; i < s; ++i)
+  {
+    erase(pos);
+  }
+}
+
+template< class T >
+void topit::Vector< T >::erase(VecIter< T > start, VecIter< T > end)
+{
+  size_t s = start.pos_;
+  size_t e = end.pos_;
+
+  erase(s, e);
 }
 
 template< class T >
